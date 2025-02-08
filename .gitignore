@@ -1,0 +1,27 @@
+# Python/Django
+*.pyc
+__pycache__/
+db.sqlite3
+/media/
+.env
+
+# Node.js/Vite/React
+node_modules/
+dist/
+.env
+.DS_Store
+
+# OS generated files
+Thumbs.db
+.DS_Store
+
+# Logs
+*.log
+
+# Virtual Environments
+venv/
+.env/
+.env.*
+
+# JetBrains IDEs
+.idea/
