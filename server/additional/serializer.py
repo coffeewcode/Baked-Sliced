@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from models import Additional
+from utils.sales_validations import price_validator, stock_quantity_validator
 
 
 class AdditionalSerializer(serializers.Serializer):
@@ -9,11 +10,7 @@ class AdditionalSerializer(serializers.Serializer):
         read_only_fields = ["id"]
 
     def validate_quantity(self, value):
-        if value < 0 or value > 100:
-            raise serializers.ValidationError("This value is not supported")
-        return value
+        stock_quantity_validator(value)
 
     def validate_price(self, value):
-        if value <= 0:
-            raise serializers.ValidationError("The price needs to be bigger than 0")
-        return value
+        price_validator(value)
