@@ -24,6 +24,7 @@ class Product(models.Model):
     )
     stock_quantity = models.IntegerField(default=0)
     additional_available = models.ManyToManyField(Additional, related_name="products")
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
