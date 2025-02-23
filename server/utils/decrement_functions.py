@@ -4,3 +4,8 @@ def decrement_stock_default(self, requested_quantity, message):
         self.save()
     else:
         raise ValueError(f"There is no more {message}. The stock available is 0. ")
+
+
+def increment_stock_default(self, quantity_to_add):
+    self.stock_quantity = quantity_to_add
+    self.save()
