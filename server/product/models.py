@@ -18,6 +18,7 @@ class Product(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     name = models.CharField(max_length=70)
     description = models.CharField(max_length=300)
+    price = models.DecimalField(max_digits=5, decimal_places=2)
     category = models.ForeignKey(
         Category,
         on_delete=models.CASCADE,
