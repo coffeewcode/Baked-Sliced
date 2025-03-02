@@ -1,6 +1,6 @@
 from django.db import models
 import uuid
-from utils.decrement_functions import decrement_stock_default
+from utils.decrement_functions import decrement_stock_default, increment_stock_default
 
 
 class Additional(models.Model):
@@ -15,4 +15,7 @@ class Additional(models.Model):
         return self.name
 
     def decrement_stock(self, quantity):
-        decrement_stock_default(self, quantity, self.name)
+        return decrement_stock_default(self, quantity, self.name)
+
+    def increment_stock(self, quantity):
+        return increment_stock_default(self, quantity)
