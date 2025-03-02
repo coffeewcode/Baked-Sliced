@@ -10,36 +10,81 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('additional', '0001_initial'),
-        ('product', '0001_initial'),
+        ("additional", "0001_initial"),
+        ("product", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='OrderItem',
+            name="OrderItem",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('observation', models.CharField(blank=True, max_length=200)),
-                ('total_price', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('quantity', models.IntegerField(default=0)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('finished_at', models.DateTimeField(blank=True, default=None, null=True)),
-                ('is_delivered', models.BooleanField(default=False)),
-                ('product', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='final_product', to='product.product')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("observation", models.CharField(blank=True, max_length=200)),
+                ("total_price", models.DecimalField(decimal_places=2, max_digits=10)),
+                ("quantity", models.IntegerField(default=0)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "finished_at",
+                    models.DateTimeField(blank=True, default=None, null=True),
+                ),
+                ("is_delivered", models.BooleanField(default=False)),
+                (
+                    "product",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="final_product",
+                        to="product.product",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='OrderItemAdditional',
+            name="OrderItemAdditional",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('quantity', models.IntegerField()),
-                ('additional', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='order_item_additional', to='additional.additional')),
-                ('order_item', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='order_item_additional', to='order.orderitem')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("quantity", models.IntegerField()),
+                (
+                    "additional",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="order_item_additional",
+                        to="additional.additional",
+                    ),
+                ),
+                (
+                    "order_item",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="order_item_additional",
+                        to="order.orderitem",
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='orderitem',
-            name='additional',
-            field=models.ManyToManyField(blank=True, related_name='order_items', through='order.OrderItemAdditional', to='additional.additional'),
+            model_name="orderitem",
+            name="additional",
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="order_items",
+                through="order.OrderItemAdditional",
+                to="additional.additional",
+            ),
         ),
     ]
