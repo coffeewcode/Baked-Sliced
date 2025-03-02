@@ -1,12 +1,10 @@
-from django.shortcuts import render
-from django.forms import ValidationError
-from django.shortcuts import render
-from rest_framework import generics, status
-from rest_framework.response import Response
+from rest_framework import generics
 from .serializer import (
+    OrderItemAdditionalListSerializer,
     OrderItemListSerializer,
     OrderItemSerializer,
     OrderItemAdditionalSerializer,
+    OrderItemUpdateSerializer,
 )
 from .models import OrderItem, OrderItemAdditional
 
@@ -33,12 +31,18 @@ class OrderItemPatchView(generics.UpdateAPIView):
     lookup_field = "id"
 
 
-class OrderItemAdditionalCreateView(generics.CreateAPIView):
+class OrderItemAdditionalDestroyView(generics.DestroyAPIView):
     serializer_class = OrderItemAdditionalSerializer
     queryset = OrderItemAdditional.objects.all()
+    lookup_field = "id"
 
-    def create(self, request):
-        serializer = self.get_serializer(request=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer=serializer)
-        return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+
+class OrderItemAdditionalListView(generics.ListAPIView):
+    serializer_class = OrderItemAdditionalListSerializer
+    queryset = OrderItemAdditional.objects.all()
+
+
+class OrderItemAdditionalUpdateView(generics.UpdateAPIView):
+    serializer_class = OrderItemUpdateSerializer
+    queryset = OrderItemAdditional.objects.all()
+    lookup_field = "id"
