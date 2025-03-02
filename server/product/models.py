@@ -2,7 +2,7 @@ from django.db import models
 from additional.models import Additional
 import uuid
 
-from utils.decrement_functions import decrement_stock_default, increment_stock_default
+from utils.manipulate_stock import decrement_stock_default, increment_stock_default
 
 
 class Category(models.Model):

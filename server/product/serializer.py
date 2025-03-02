@@ -28,7 +28,7 @@ class ProductSerializer(serializers.ModelSerializer):
             additional.id for additional in value if not additional.is_active
         ]
         out_of_stock_additional = [
-            additional.id for additional in value if additional.stock <= 0
+            additional.id for additional in value if additional.stock_quantity <= 0
         ]
         if inactive_additional:
             raise serializers.ValidationError(
@@ -55,3 +55,10 @@ class ProductListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = "__all__"
+
+
+class ProductListSerializerForOrderItem(serializers.ModelSerializer):
+
+    class Meta:
+        model = Product
+        fields = ["id", "name", "price"]

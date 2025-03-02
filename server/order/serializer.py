@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from utils.decrement_functions import decrement_stock_default, validate_stock_update
+from utils.manipulate_stock import decrement_stock_default, validate_stock_update
 from .models import OrderItem, OrderItemAdditional
 from product.models import Product
 from utils.sales_validations import stock_quantity_validator

@@ -1,6 +1,9 @@
 from django.db import models
 import uuid
-from utils.decrement_functions import decrement_stock_default, increment_stock_default
+from utils.manipulate_stock import (
+    decrement_stock_default,
+    increment_stock_default,
+)
 
 
 class Additional(models.Model):
