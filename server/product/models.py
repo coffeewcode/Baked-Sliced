@@ -33,7 +33,7 @@ class Product(models.Model):
         return self.name
 
     def decrement_stock(self, quantity):
-        decrement_stock_default(self, quantity, self.name)
+        return decrement_stock_default(self, quantity, self.name)
 
     def increment_stock(self, quantity):
-        increment_stock_default(self, quantity)
+        return increment_stock_default(self, quantity)
