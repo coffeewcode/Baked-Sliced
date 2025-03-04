@@ -24,24 +24,30 @@ class ProductSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
 
     def validate_additional_available(self, value):
+        errors = []
+
         inactive_additional = [
             additional.id for additional in value if not additional.is_active
         ]
         out_of_stock_additional = [
             additional.id for additional in value if additional.stock_quantity <= 0
         ]
+
         if inactive_additional:
-            raise serializers.ValidationError(
+            errors.append(
                 f"The following additional are inactive: {', '.join(map(str, inactive_additional))}"
             )
 
         if out_of_stock_additional:
-            raise serializers.ValidationError(
+            errors.append(
                 f"The following additional are out of stock or have no stock: {', '.join(map(str, out_of_stock_additional))}"
             )
+
+        if errors:
+            raise serializers.ValidationError(errors)
         return value
 
-    def validate_quantity(self, value):
+    def validate_stock_quantity(self, value):
         return stock_quantity_validator(value)
 
     def validate_price(self, value):

@@ -1,4 +1,4 @@
-def decrement_stock_default(self, requested_quantity, message):
+def decrement_stock_default(self, requested_quantity, message="elements"):
     if self.stock_quantity >= requested_quantity:
         self.stock_quantity -= requested_quantity
         self.save()
