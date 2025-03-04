@@ -1,11 +1,18 @@
-from unittest.mock import MagicMock, patch
-from django.forms import ValidationError
+from unittest.mock import patch
 import pytest
-from product.serializer import ProductSerializer
-from product.models import Product, Category
+from product.serializer import ProductSerializer, AdditionalSerializer
 from decimal import Decimal
-import uuid
-from additional.models import Additional
+
+
+@pytest.mark.django_db
+def test_category_serializer_with_valid_data(category_with_valid_data):
+    serializer = AdditionalSerializer(data=category_with_valid_data)
+
+    assert serializer.is_valid(), serializer.errors
+    validated_data = serializer.validated_data
+    assert validated_data["name"] == "Test Category"
+    assert validated_data["description"] == "Description Test Category"
+    assert validated_data["price"] == Decimal("55.00")
 
 
 @pytest.mark.django_db
