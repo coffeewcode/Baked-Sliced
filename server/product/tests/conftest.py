@@ -10,6 +10,16 @@ def category(db):
 
 
 @pytest.fixture
+def category_with_valid_data():
+    """Returns valid category."""
+    return {
+        "name": "Test Category",
+        "description": "Description Test Category",
+        "price": "55.00",
+    }
+
+
+@pytest.fixture
 def product_with_valid_data(category):
     """Returns valid product data with a linked category."""
     return {

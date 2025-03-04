@@ -6,6 +6,7 @@ import pytest
 
 @pytest.fixture
 def product():
+    """Creates and returns a Product object."""
     category = Category.objects.create(name="Mocked Category")
     return Product.objects.create(
         name="Test Product",
@@ -18,6 +19,7 @@ def product():
 
 @pytest.fixture
 def additional():
+    """Creates and returns an Additional object."""
     return Additional.objects.create(
         name="Test Additional",
         price=Decimal("5.00"),
@@ -27,6 +29,7 @@ def additional():
 
 @pytest.fixture
 def order_item_data(product, additional):
+    """Returns a dictionary representing order item data."""
     return {
         "product": product.id,
         "quantity": 2,
