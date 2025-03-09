@@ -11,7 +11,7 @@ def increment_stock_default(self, quantity_to_add):
     self.save()
 
 
-def validate_stock_update(self, new_quantity, instance, attr):
+def validate_stock_and_update(self, new_quantity, instance, attr):
     if new_quantity != instance.quantity:
         if new_quantity > instance.quantity:
             attr.increment_stock(instance.quantity)
