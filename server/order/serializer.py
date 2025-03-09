@@ -1,4 +1,3 @@
-from decimal import Decimal
 from rest_framework import serializers
 from utils.manipulate_stock import validate_stock_and_update
 from .models import OrderItem, OrderItemAdditional
@@ -48,8 +47,10 @@ class OrderItemAdditionalUpdateSerializer(serializers.ModelSerializer):
 
         old_total_additional_price = instance.quantity * instance.additional.price
 
-        if instance.additional != new_additional:
+        if new_additional and instance.additional != new_additional:
+            instance.additional.increment_stock(instance.quantity)
             instance.additional = new_additional
+            instance.additional.decrement_stock(instance.quantity)
             instance.additional_data = {}
 
         if not instance.additional and instance.quantity != new_quantity:
@@ -173,7 +174,11 @@ class OrderItemUpdateSerializer(serializers.ModelSerializer):
 
         old_total_product_price = instance.product.price * instance.quantity
 
-        if new_product != instance.product and not instance.is_delivered:
+        if (
+            new_product
+            and new_product != instance.product
+            and not instance.is_delivered
+        ):
             instance.product.increment_stock(instance.quantity)
             instance.product = new_product
             instance.product.decrement_stock(instance.quantity)
