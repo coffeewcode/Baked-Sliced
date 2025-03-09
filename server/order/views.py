@@ -58,6 +58,3 @@ class OrderItemAdditionalUpdateView(generics.UpdateAPIView):
     serializer_class = OrderItemAdditionalUpdateSerializer
     queryset = OrderItemAdditional.objects.all()
     lookup_field = "id"
-
-
-# view to delete all order item additional from an order
