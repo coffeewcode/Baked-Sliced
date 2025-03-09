@@ -21,7 +21,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=5, decimal_places=2)
     category = models.ForeignKey(
         Category,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
     )
     stock_quantity = models.IntegerField(default=0)
     additional_available = models.ManyToManyField(
