@@ -1,3 +1,4 @@
+from decimal import Decimal
 from rest_framework import serializers
 from utils.manipulate_stock import validate_stock_and_update
 from .models import OrderItem, OrderItemAdditional
@@ -7,14 +8,10 @@ from .services import OrderProcessService
 
 
 class OrderItemAdditionalListSerializer(serializers.ModelSerializer):
-    additional_price = serializers.SerializerMethodField()
 
     class Meta:
         model = OrderItemAdditional
         fields = "__all__"
-
-    def get_additional_price(self, obj):
-        return obj.additional.price
 
 
 class OrderItemAdditionalSerializerForOrderItem(serializers.ModelSerializer):
@@ -42,25 +39,39 @@ class OrderItemAdditionalUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderItemAdditional
-        fields = ["quantity"]
+        fields = ["quantity", "additional", "additional_data"]
+        read_only_fields = ["additional_data"]
 
     def update(self, instance, validated_data):
         new_quantity = validated_data.get("quantity", 0)
+        new_additional = validated_data["additional"]
+
+        old_total_additional_price = instance.quantity * instance.additional.price
+
+        if instance.additional != new_additional:
+            instance.additional = new_additional
+            instance.additional_data = {}
+
+        if not instance.additional and instance.quantity != new_quantity:
+            raise serializers.ValidationError(
+                "It's not possible to change the quantity of a non registered additional"
+            )
 
         validate_stock_and_update(self, new_quantity, instance, instance.additional)
 
         order_item = instance.order_item
 
-        old_total_additional_price = instance.quantity * instance.additional.price
-        total_additional_price = sum(
-            new_quantity * additional.additional.price
-            for additional in order_item.order_item_additional.all()
+        new_total_additional_price = new_quantity * new_additional.price
+
+        price_difference_to_increment = (
+            new_total_additional_price - old_total_additional_price
         )
 
-        order_item.total_price += total_additional_price - old_total_additional_price
+        order_item.total_price += price_difference_to_increment
+
+        instance.quantity = new_quantity
 
         order_item.save()
-        instance.quantity = new_quantity
         instance.save()
         return instance
 
@@ -126,7 +137,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
         for additional_data in additional_items:
             additional = Additional.objects.get(id=additional_data["additional_id"])
-
+            additional.decrement_stock(additional_data["quantity"])
             OrderItemAdditional.objects.create(
                 order_item=order_item,
                 additional=additional,
@@ -137,7 +148,6 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 
 class OrderItemUpdateSerializer(serializers.ModelSerializer):
-    order_item_additional = OrderItemAdditionalSerializer(many=True, required=False)
     product = serializers.PrimaryKeyRelatedField(
         queryset=Product.objects.all(), required=False
     )
@@ -150,12 +160,10 @@ class OrderItemUpdateSerializer(serializers.ModelSerializer):
             "total_price",
             "quantity",
             "is_delivered",
-            "order_item_additional",
         ]
         read_only_fields = ["total_price"]
 
     def update(self, instance, validated_data):
-        additional_items = validated_data.pop("order_item_additional", None)
         new_product = validated_data.get("product", instance.product)
         new_product_quantity = validated_data.get("quantity", instance.quantity)
 
@@ -163,37 +171,20 @@ class OrderItemUpdateSerializer(serializers.ModelSerializer):
             self, new_product_quantity, instance, instance.product
         )
 
-        if new_product != instance.product:
+        old_total_product_price = instance.product.price * instance.quantity
+
+        if new_product != instance.product and not instance.is_delivered:
+            instance.product.increment_stock(instance.quantity)
             instance.product = new_product
-            # TODO: when change the instance reference, decrement the old stock_quantity too with the new one
+            instance.product.decrement_stock(instance.quantity)
             instance.product_data = {}
 
-        if additional_items is not None:
-            product_additional_available = instance.product.additional_available.all()
-
-            if not product_additional_available and additional_items:
-                raise serializers.ValidationError(
-                    f"Product {instance.product.name} does not have any additional available."
-                )
-
-            total_additional_price = (
-                OrderProcessService.calculate_total_additional_price(
-                    additional_items,
-                    product_additional_available,
-                    instance.product.name,
-                )
-            )
-            instance.order_item_additional.all().delete()
-
-            for item in additional_items:
-                OrderItemAdditional.objects.create(
-                    order_item=instance,
-                    quantity=item["quantity"],
-                )
-
-        instance.total_price = (
-            instance.product.price * new_product_quantity + total_additional_price
+        new_total_product_price = new_product.price * new_product_quantity
+        price_difference_to_increment = (
+            new_total_product_price - old_total_product_price
         )
+        instance.total_price += price_difference_to_increment
+
         instance.observation = validated_data.get("observation", instance.observation)
         instance.quantity = new_product_quantity
         instance.is_delivered = validated_data.get(
