@@ -1,3 +1,4 @@
+from decimal import Decimal
 from rest_framework import serializers
 from utils.manipulate_stock import validate_stock_and_update
 from .models import OrderItem, OrderItemAdditional
@@ -43,12 +44,16 @@ class OrderItemAdditionalUpdateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         new_quantity = validated_data.get("quantity", 0)
-        new_additional = validated_data["additional"]
+        new_additional = validated_data.get("additional", instance.additional)
 
-        old_total_additional_price = instance.quantity * instance.additional.price
+        old_total_additional_price = instance.quantity * Decimal(
+            instance.additional_data["price"]
+        )
+
+        if instance.additional and instance.additional != new_additional:
+            instance.additional.increment_stock(instance.quantity)
 
         if new_additional and instance.additional != new_additional:
-            instance.additional.increment_stock(instance.quantity)
             instance.additional = new_additional
             instance.additional.decrement_stock(instance.quantity)
             instance.additional_data = {}
@@ -167,31 +172,37 @@ class OrderItemUpdateSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         new_product = validated_data.get("product", instance.product)
         new_product_quantity = validated_data.get("quantity", instance.quantity)
-
-        validate_stock_and_update(
-            self, new_product_quantity, instance, instance.product
+        old_total_product_price = (
+            Decimal(instance.product_data["price"]) * instance.quantity
         )
 
-        old_total_product_price = instance.product.price * instance.quantity
-
-        if (
-            new_product
-            and new_product != instance.product
-            and not instance.is_delivered
-        ):
+        if instance.product and instance.product != new_product:
             instance.product.increment_stock(instance.quantity)
+
+        if not instance.product and instance.quantity != new_product_quantity:
+            raise serializers.ValidationError(
+                "It's not possible to change the quantity of a non registered product"
+            )
+
+        if new_product and instance.product != new_product:
             instance.product = new_product
             instance.product.decrement_stock(instance.quantity)
             instance.product_data = {}
 
-        new_total_product_price = new_product.price * new_product_quantity
-        price_difference_to_increment = (
-            new_total_product_price - old_total_product_price
-        )
-        instance.total_price += price_difference_to_increment
+        if new_product and not instance.is_delivered:
+
+            validate_stock_and_update(
+                self, new_product_quantity, instance, instance.product
+            )
+
+            new_total_product_price = new_product.price * new_product_quantity
+            price_difference_to_increment = (
+                new_total_product_price - old_total_product_price
+            )
+            instance.total_price += price_difference_to_increment
+            instance.quantity = new_product_quantity
 
         instance.observation = validated_data.get("observation", instance.observation)
-        instance.quantity = new_product_quantity
         instance.is_delivered = validated_data.get(
             "is_delivered", instance.is_delivered
         )
