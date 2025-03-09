@@ -22,10 +22,10 @@ class OrderItem(models.Model):
         if not self.finished_at and self.is_delivered:
             self.mark_as_finished()
         if self.product and not self.product_data:
-            self.product_data = self.populate_product_data(self.product)
+            self.product_data = self.__populate_product_data(self.product)
         super().save(*args, **kwargs)
 
-    def populate_product_data(self, product):
+    def __populate_product_data(self, product):
         return {
             "name": product.name,
             "description": product.description,
