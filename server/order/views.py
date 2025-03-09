@@ -1,6 +1,7 @@
 from rest_framework import generics
 from .serializer import (
     OrderItemAdditionalListSerializer,
+    OrderItemAdditionalUpdateSerializer,
     OrderItemListSerializer,
     OrderItemSerializer,
     OrderItemAdditionalSerializer,
@@ -25,8 +26,8 @@ class OrderItemDestroyView(generics.DestroyAPIView):
     lookup_field = "id"
 
 
-class OrderItemPatchView(generics.UpdateAPIView):
-    serializer_class = OrderItemSerializer
+class OrderItemUpdateView(generics.UpdateAPIView):
+    serializer_class = OrderItemUpdateSerializer
     queryset = OrderItem.objects.all()
     lookup_field = "id"
 
@@ -43,6 +44,6 @@ class OrderItemAdditionalListView(generics.ListAPIView):
 
 
 class OrderItemAdditionalUpdateView(generics.UpdateAPIView):
-    serializer_class = OrderItemUpdateSerializer
+    serializer_class = OrderItemAdditionalUpdateSerializer
     queryset = OrderItemAdditional.objects.all()
     lookup_field = "id"
