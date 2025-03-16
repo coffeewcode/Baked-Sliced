@@ -8,7 +8,7 @@ class Address(models.Model):
     street = models.CharField(max_length=40)
     postal_code = models.CharField(max_length=10)
     city = models.CharField(max_length=50)
-    state = models.CharField(max_length=30)
+    state = models.CharField(max_length=30, null=True, blank=True)
     observations = models.CharField(max_length=200, blank=True)
     complement = models.CharField(max_length=100, blank=True)
 
