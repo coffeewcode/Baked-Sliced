@@ -13,5 +13,5 @@ class Address(models.Model):
     complement = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
-        return f"{self.name}, {self.street}, {self.num}, {self.city}, {self.state}, {self.postal_code}"
+        return f"{self.name}, {self.street}"
 
