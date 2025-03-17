@@ -3,21 +3,22 @@ from .models import Address
 from .serializers import AddressSerializer
 
 class AddressListView(generics.ListAPIView):
-    queryset = Address.objects.all()
     serializer_class = AddressSerializer
+    queryset = Address.objects.all()
 
 class AddressCreateView(generics.CreateAPIView):
-    queryset = Address.objects.all()
     serializer_class = AddressSerializer
-
+    queryset = Address.objects.all()
+    
 class AddressDetailView(generics.RetrieveAPIView):
-    queryset = Address.objects.all()
     serializer_class = AddressSerializer
-
+    queryset = Address.objects.all()
+    
 class AddressUpdateView(generics.UpdateAPIView):
-    queryset = Address.objects.all()
     serializer_class = AddressSerializer
-
+    queryset = Address.objects.all()
+    
 class AddressDeleteView(generics.DestroyAPIView):
-    queryset = Address.objects.all()
     serializer_class = AddressSerializer
+    queryset = Address.objects.all()
+    

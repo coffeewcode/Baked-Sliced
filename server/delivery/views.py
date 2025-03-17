@@ -3,21 +3,22 @@ from .models import Delivery
 from .serializers import DeliverySerializer
 
 class DeliveryListView(generics.ListAPIView):
-    queryset = Delivery.objects.all()
     serializer_class = DeliverySerializer
+    queryset = Delivery.objects.all()
 
 class DeliveryCreateView(generics.CreateAPIView):
-    queryset = Delivery.objects.all()
     serializer_class = DeliverySerializer
-
+    queryset = Delivery.objects.all()
+    
 class DeliveryDetailView(generics.RetrieveAPIView):
-    queryset = Delivery.objects.all()
     serializer_class = DeliverySerializer
+    queryset = Delivery.objects.all()
 
 class DeliveryUpdateView(generics.UpdateAPIView):
-    queryset = Delivery.objects.all()
     serializer_class = DeliverySerializer
-
+    queryset = Delivery.objects.all()
+    
 class DeliveryDeleteView(generics.DestroyAPIView):
-    queryset = Delivery.objects.all()
     serializer_class = DeliverySerializer
+    queryset = Delivery.objects.all()
+    
