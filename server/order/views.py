@@ -1,6 +1,7 @@
 from rest_framework import generics
 from .serializer import (
     OrderItemAdditionalListSerializer,
+    OrderItemAdditionalUpdateSerializer,
     OrderItemListSerializer,
     OrderItemSerializer,
     OrderItemAdditionalSerializer,
@@ -24,9 +25,20 @@ class OrderItemDestroyView(generics.DestroyAPIView):
     queryset = OrderItem.objects.all()
     lookup_field = "id"
 
+    def perform_destroy(self, instance):
+        if not instance.is_delivered and instance.product:
+            instance.product.increment_stock(instance.quantity)
+            for order_item_additional in instance.order_item_additional.all():
+                if order_item_additional.additional:
+                    order_item_additional.additional.increment_stock(
+                        order_item_additional.quantity
+                    )
+        # TODO: its not possible to exclude an order when the delivery is in the way
+        instance.delete()
 
-class OrderItemPatchView(generics.UpdateAPIView):
-    serializer_class = OrderItemSerializer
+
+class OrderItemUpdateView(generics.UpdateAPIView):
+    serializer_class = OrderItemUpdateSerializer
     queryset = OrderItem.objects.all()
     lookup_field = "id"
 
@@ -43,6 +55,6 @@ class OrderItemAdditionalListView(generics.ListAPIView):
 
 
 class OrderItemAdditionalUpdateView(generics.UpdateAPIView):
-    serializer_class = OrderItemUpdateSerializer
+    serializer_class = OrderItemAdditionalUpdateSerializer
     queryset = OrderItemAdditional.objects.all()
     lookup_field = "id"

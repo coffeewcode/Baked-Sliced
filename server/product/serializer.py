@@ -56,7 +56,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
 class ProductListSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
-    additional = AdditionalSerializer(read_only=True)
+    additional_available = AdditionalSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
@@ -67,4 +67,4 @@ class ProductListSerializerForOrderItem(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ["id", "name", "price"]
+        fields = ["id"]
