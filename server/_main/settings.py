@@ -1,7 +1,8 @@
 import os
 from pathlib import Path
 import dotenv
-
+import os
+from pythonjsonlogger import jsonlogger
 
 dotenv.load_dotenv()
 
@@ -19,7 +20,6 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
 DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -33,12 +33,13 @@ DEPENDENCIES = [
     "rest_framework",
 ]
 
+MY_APPS = ["product", "additional", "order", "middleware", "delivery", "address"]
 
-MY_APPS = ["product", "additional", "order", "delivery", "address"]
 
 INSTALLED_APPS = DJANGO_APPS + DEPENDENCIES + MY_APPS
 
 MIDDLEWARE = [
+    "middleware.logging_middleware.RequestLoggingMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -70,8 +71,6 @@ WSGI_APPLICATION = "_main.wsgi.application"
 
 
 # Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
 if os.environ.get("TEST"):
     DATABASES = {
         "default": {
@@ -93,8 +92,6 @@ else:
 
 
 # Password validation
-# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -112,8 +109,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/5.1/topics/i18n/
-
 LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "UTC"
@@ -124,11 +119,56 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
-
 STATIC_URL = "static/"
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+#  Logging configuration
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "json": {
+            "()": jsonlogger.JsonFormatter,
+            "format": """
+                %(asctime)s %(levelname)s %(name)s
+                %(message)s %(pathname)s %(lineno)d
+                %(process)d %(thread)d %(threadName)s
+            """,
+            "datefmt": "%Y-%m-%dT%H:%M:%SZ",
+            "rename_fields": {"levelname": "level", "name": "logger"},
+            "json_indent": 4,
+            "reserved_attrs": [],
+        },
+        "verbose": {
+            "format": "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)d] %(message)s",
+            "datefmt": "%Y-%m-%dT%H:%M:%SZ",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "json" if not DEBUG else "verbose",
+        },
+        "file": {
+            "class": "logging.handlers.TimedRotatingFileHandler",
+            "filename": os.path.join(BASE_DIR, "logs/django-app.log"),
+            "when": "midnight",
+            "backupCount": 30,
+            "formatter": "json",
+            "encoding": "utf-8",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+    "root": {
+        "handlers": ["console", "file"],
+        "level": "DEBUG" if DEBUG else "INFO",
+    },
+}
