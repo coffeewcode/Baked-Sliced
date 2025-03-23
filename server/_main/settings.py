@@ -33,7 +33,15 @@ DEPENDENCIES = [
     "rest_framework",
 ]
 
-MY_APPS = ["product", "additional", "order", "middleware", "delivery", "address"]
+MY_APPS = [
+    "product",
+    "additional",
+    "order",
+    "middleware",
+    "delivery",
+    "address",
+    "shopping_cart",
+]
 
 
 INSTALLED_APPS = DJANGO_APPS + DEPENDENCIES + MY_APPS
