@@ -1,7 +1,7 @@
 from decimal import Decimal
 from rest_framework import serializers
 from utils.manipulate_stock import validate_stock_and_update
-from .models import OrderItem, OrderItemAdditional
+from .models import Order, OrderItem, OrderItemAdditional
 from product.models import Product
 from additional.models import Additional
 from .services import OrderProcessService
@@ -121,6 +121,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "total_price", "product_data"]
 
     def create(self, validated_data):
+        order_id = validated_data.pop("order")
         additional_items = validated_data.pop("order_item_additional", [])
         product = validated_data["product"]
 
@@ -138,7 +139,9 @@ class OrderItemSerializer(serializers.ModelSerializer):
         total_product_price = product.price * validated_data["quantity"]
         total_price = total_additional_price + total_product_price
 
-        order_item = OrderItem.objects.create(total_price=total_price, **validated_data)
+        order_item = OrderItem.objects.create(
+            total_price=total_price, order=order_id, **validated_data
+        )
         product.decrement_stock(validated_data["quantity"])
 
         for additional_data in additional_items:

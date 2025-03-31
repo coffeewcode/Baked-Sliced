@@ -11,12 +11,15 @@ class ShoppingCart(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    user = models.CharField(
+        default="1",
+    )
 
     def __str__(self):
         return f"Shopping Cart {self.id}"
 
     def convert_to_order(self):
-        order = Order.objects.create(user=self.user)
+        order = Order.objects.create(user="1")
 
         for cart_item in self.items.all():
             order_item_data = {
