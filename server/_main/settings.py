@@ -27,6 +27,7 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "drf_yasg",
 ]
 
 DEPENDENCIES = [
@@ -186,3 +187,5 @@ LOGGING = {
         "level": "DEBUG" if DEBUG else "INFO",
     },
 }
+
+SWAGGER_SETTINGS = {"SECURITY_DEFINITIONS": {"Basic": {"type": "basic"}}}
