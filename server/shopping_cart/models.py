@@ -11,15 +11,12 @@ class ShoppingCart(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    user = models.CharField(
-        default="1",
-    )
 
     def __str__(self):
         return f"Shopping Cart {self.id}"
 
     def convert_to_order(self):
-        order = Order.objects.create(user="1")
+        order = Order.objects.create()
 
         for cart_item in self.items.all():
             order_item_data = {
@@ -32,8 +29,9 @@ class ShoppingCart(models.Model):
                     }
                     for additional_item in cart_item.selected_additionals.all()
                 ],
+                "observation": cart_item.observation,
             }
-
+            print(order_item_data)
             serializer = OrderItemSerializer(
                 data=order_item_data, context={"order": order}
             )
@@ -56,6 +54,7 @@ class ShoppingCartItem(models.Model):
     additionals = models.ManyToManyField(
         Additional, through="ShoppingCartItemAdditional"
     )
+    observation = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
         return f"{self.quantity}x {self.product.name} in Cart {self.shopping_cart.id}"
