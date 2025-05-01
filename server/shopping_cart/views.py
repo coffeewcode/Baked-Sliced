@@ -6,17 +6,20 @@ from additional.models import Additional
 from rest_framework.generics import ListAPIView, DestroyAPIView
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from .serializers import ShoppingCartSerializer
+from .serializers import ShoppingCartItemSerializer, ShoppingCartSerializer
 
 
 class AddItemsInShoppingCartView(APIView):
     def post(self, request):
+        serializer = ShoppingCartItemSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=400)
+
         product_id = request.data.get("product")
         quantity = request.data.get("quantity")
-        additional_items = request.data.get("additional_items")
+        additional_items = request.data.get("additionals")
         observation = request.data.get("observation")
 
-        print(additional_items)
         product = get_object_or_404(Product, id=product_id)
 
         cart, _ = ShoppingCart.objects.get_or_create()
@@ -29,12 +32,11 @@ class AddItemsInShoppingCartView(APIView):
         )
 
         for item in additional_items:
-            item_id = item.get("additional_id")
+            item_id = item.get("additional")
             item_quantity = item.get("quantity")
 
             additional = get_object_or_404(Additional, id=item_id)
 
-            print(additional)
             ShoppingCartItemAdditional.objects.create(
                 shopping_cart_item=shopping_cart_item,
                 additional=additional,
