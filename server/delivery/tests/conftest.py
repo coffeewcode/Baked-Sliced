@@ -2,17 +2,19 @@ import pytest
 from delivery.models import Delivery, DeliveryType, DeliveryStatus
 from address.models import Address
 
+
 @pytest.fixture
 def address(db):
-    """Creates and returns an Address object to be used in Delivery tests."""
+    """Create and return an Address object to be used in Delivery tests."""
     return Address.objects.create(
         name="Office",
         num="456",
         street="Corporate Street",
         postal_code="87654-321",
         city="São Paulo",
-        state="SP"
+        state="SP",
     )
+
 
 @pytest.fixture
 def delivery_data(address):
@@ -23,10 +25,11 @@ def delivery_data(address):
         "price": "25.00",
         "estimated_time": "45 minutes",
         "observations": "Handle with care",
-        "status": DeliveryStatus.PENDING
+        "status": DeliveryStatus.PENDING,
     }
+
 
 @pytest.fixture
 def create_delivery(db, delivery_data):
-    """Creates and returns a Delivery object using the provided data."""
+    """Create and return a Delivery object using the provided data."""
     return Delivery.objects.create(**delivery_data)

@@ -4,7 +4,7 @@ import pytest
 
 @pytest.fixture
 def additional(db):
-    """Returns valid additional data"""
+    """Return valid additional data"""
     return {
         "name": "Test Additional",
         "price": 5,
@@ -15,7 +15,7 @@ def additional(db):
 
 @pytest.fixture
 def additional_object(db):
-    """Returns valid additional object"""
+    """Return valid additional object"""
     return Additional.objects.create(
         name="Test Additional", price=5, stock_quantity=20, is_active=True
     )

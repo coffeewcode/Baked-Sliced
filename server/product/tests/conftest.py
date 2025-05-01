@@ -5,13 +5,13 @@ from product.models import Category, Product
 
 @pytest.fixture
 def category(db):
-    """Creates and returns a Category object."""
+    """Create and return a Category object."""
     return Category.objects.create(name="Mocked Category")
 
 
 @pytest.fixture
 def category_with_valid_data():
-    """Returns valid category."""
+    """Return valid category."""
     return {
         "name": "Test Category",
         "description": "Description Test Category",
@@ -21,7 +21,7 @@ def category_with_valid_data():
 
 @pytest.fixture
 def product_with_valid_data(category):
-    """Returns valid product data with a linked category."""
+    """Return valid product data with a linked category."""
     return {
         "name": "Chocolate Pizza",
         "description": "For a firewood",
@@ -35,7 +35,7 @@ def product_with_valid_data(category):
 
 @pytest.fixture
 def additional_with_valid_data(db):
-    """Creates and returns a Additional objects."""
+    """Create and return a Additional objects."""
 
     def _create_additional(is_active=True, stock_quantity=5):
         additional_1 = Additional.objects.create(
@@ -57,7 +57,7 @@ def additional_with_valid_data(db):
 
 @pytest.fixture
 def active_additional():
-    """Creates and returns a Additional with property is_active equal True to validate it."""
+    """Create and return a Additional with property is_active equal True to validate it."""
     return Additional.objects.create(
         name="Active Additional", is_active=True, price=5, stock_quantity=10
     )
@@ -65,7 +65,7 @@ def active_additional():
 
 @pytest.fixture
 def inactive_additional():
-    """Creates and returns a Additional with property is_active equal False to validate it."""
+    """Create and return a Additional with property is_active equal False to validate it."""
     return Additional.objects.create(
         name="Inactive Additional", is_active=False, price=5, stock_quantity=10
     )
@@ -73,7 +73,7 @@ def inactive_additional():
 
 @pytest.fixture
 def out_of_stock_additional():
-    """Creates and returns a Additional out of stock to validate it."""
+    """Create and return a Additional out of stock to validate it."""
     return Additional.objects.create(
         name="Out of Stock Additional", is_active=True, price=5, stock_quantity=0
     )
@@ -81,7 +81,7 @@ def out_of_stock_additional():
 
 @pytest.fixture
 def product(category):
-    """Creates and returns a Product to validate the incremental and decrement stock."""
+    """Create and return a Product to validate the incremental and decrement stock."""
     return Product.objects.create(
         name="Test Product",
         description="Test Description",
