@@ -7,6 +7,13 @@ from additional.models import Additional
 from .services import OrderProcessService
 
 
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ["id", "created_at", "updated_at", "is_delivered"]
+        read_only_fields = ["id", "created_at", "updated_at"]
+
+
 class OrderItemAdditionalListSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -96,9 +103,6 @@ class OrderItemListSerializer(serializers.ModelSerializer):
             "observation",
             "total_price",
             "quantity",
-            "created_at",
-            "finished_at",
-            "is_delivered",
             "order_item_additional",
         ]
 
@@ -121,7 +125,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "total_price", "product_data"]
 
     def create(self, validated_data):
-        order_id = validated_data.pop("order")
+        order = self.context["order"]
         additional_items = validated_data.pop("order_item_additional", [])
         product = validated_data["product"]
 
@@ -140,7 +144,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
         total_price = total_additional_price + total_product_price
 
         order_item = OrderItem.objects.create(
-            total_price=total_price, order=order_id, **validated_data
+            total_price=total_price, order=order, **validated_data
         )
         product.decrement_stock(validated_data["quantity"])
 
@@ -168,7 +172,6 @@ class OrderItemUpdateSerializer(serializers.ModelSerializer):
             "observation",
             "total_price",
             "quantity",
-            "is_delivered",
         ]
         read_only_fields = ["total_price"]
 

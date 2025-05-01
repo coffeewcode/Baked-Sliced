@@ -10,9 +10,6 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     finished_at = models.DateTimeField(null=True, blank=True, default=None)
     is_delivered = models.BooleanField(default=False)
-    user = models.CharField(
-        default="1",
-    )
 
     def save(self, *args, **kwargs):
         if not self.finished_at and self.is_delivered:
