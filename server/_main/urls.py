@@ -43,6 +43,7 @@ urlpatterns = [
     api_include("additional.urls"),
     api_include("address.urls"),
     api_include("delivery.urls"),
+    api_include("shopping_cart.urls"),
     path(
         "swagger/",
         schema_view.with_ui("swagger", cache_timeout=0),
