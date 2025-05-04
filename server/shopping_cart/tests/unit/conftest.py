@@ -1,8 +1,13 @@
 from decimal import Decimal
+from unittest.mock import MagicMock, patch
 import pytest
 from additional.models import Additional
 from product.models import Category, Product
-from shopping_cart.models import ShoppingCart
+from shopping_cart.models import (
+    ShoppingCart,
+    ShoppingCartItem,
+    ShoppingCartItemAdditional,
+)
 from shopping_cart.serializers import ShoppingCartItemSerializer
 
 
@@ -40,3 +45,19 @@ def additional():
         price=Decimal("5.00"),
         stock_quantity=50,
     )
+
+
+@pytest.fixture
+def shopping_cart_item(shopping_cart, product):
+    shopping_cart_item = ShoppingCartItem.objects.create(
+        shopping_cart=shopping_cart, product=product, observation="Test observation"
+    )
+    return shopping_cart_item
+
+
+@pytest.fixture
+def mock_additional_item():
+    mock_additional = MagicMock(spec=ShoppingCartItemAdditional)
+    mock_additional.additional.id = 10
+    mock_additional.quantity = 1
+    return mock_additional
