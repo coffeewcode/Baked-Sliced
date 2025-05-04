@@ -1,3 +1,4 @@
+from django.forms import ValidationError
 from rest_framework.views import APIView
 from product.models import Product
 from rest_framework.response import Response
@@ -35,6 +36,8 @@ class AddItemsInShoppingCartView(APIView):
             item_id = item.get("additional")
             item_quantity = item.get("quantity")
 
+            self.__validate_additional_requirements(quantity, additional)
+
             additional = get_object_or_404(Additional, id=item_id)
 
             ShoppingCartItemAdditional.objects.create(
@@ -46,6 +49,12 @@ class AddItemsInShoppingCartView(APIView):
         return Response(
             {"message": "Item added to cart"}, status=status.HTTP_201_CREATED
         )
+
+    def __validate_additional_requirements(self, quantity, additionals):
+        if quantity > 0 and additionals:
+            raise ValidationError(
+                "The field quantity needs to be grather than 0 to add an additional"
+            )
 
 
 class OrderItemAdditionalDestroyView(DestroyAPIView):
