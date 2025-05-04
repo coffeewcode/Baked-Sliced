@@ -32,7 +32,7 @@ class OrderItem(models.Model):
     product_data = models.JSONField(default=dict)
     observation = models.CharField(max_length=200, blank=True)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
-    quantity = models.IntegerField(default=0)
+    quantity = models.PositiveIntegerField(default=1)
 
     def save(self, *args, **kwargs):
         if self.product and not self.product_data:
@@ -57,7 +57,7 @@ class OrderItemAdditional(models.Model):
         Additional, on_delete=models.SET_NULL, null=True, blank=True
     )
     additional_data = models.JSONField(default=dict)
-    quantity = models.IntegerField()
+    quantity = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
         if self.additional and not self.additional_data:
