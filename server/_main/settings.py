@@ -27,13 +27,22 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "drf_yasg",
 ]
 
 DEPENDENCIES = [
     "rest_framework",
 ]
 
-MY_APPS = ["product", "additional", "order", "middleware", "delivery", "address"]
+MY_APPS = [
+    "product",
+    "additional",
+    "order",
+    "middleware",
+    "delivery",
+    "address",
+    "shopping_cart",
+]
 
 
 INSTALLED_APPS = DJANGO_APPS + DEPENDENCIES + MY_APPS
@@ -71,13 +80,14 @@ WSGI_APPLICATION = "_main.wsgi.application"
 
 
 # Database
-if os.environ.get("TEST"):
+if os.environ.get("TEST") == True:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": BASE_DIR / "db.sqlite3",
         }
     }
+    print("\n🎯 Using SQLite for testing purposes.\n")
 else:
     DATABASES = {
         "default": {
@@ -85,11 +95,16 @@ else:
             "NAME": os.environ.get("POSTGRES_DB"),
             "USER": os.environ.get("POSTGRES_USER"),
             "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
-            "HOST": os.environ.get("POSTGRES_HOST"),
-            "PORT": os.environ.get("POSTGRES_PORT"),
+            "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
+            "PORT": os.environ.get("POSTGRES_PORT", "5432"),
         }
     }
 
+    print("\n🎯 Connecting to PostgreSQL with the following settings:")
+    print(f"  Database : {DATABASES['default']['NAME']}")
+    print(f"  User     : {DATABASES['default']['USER']}")
+    print(f"  Host     : {DATABASES['default']['HOST']}")
+    print(f"  Port     : {DATABASES['default']['PORT']}\n")
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -172,3 +187,5 @@ LOGGING = {
         "level": "DEBUG" if DEBUG else "INFO",
     },
 }
+
+SWAGGER_SETTINGS = {"SECURITY_DEFINITIONS": {"Basic": {"type": "basic"}}}
