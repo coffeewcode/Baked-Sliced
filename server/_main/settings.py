@@ -18,6 +18,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+SECURE_ACTIVATED = False if os.environ.get("TEST") else True
+SESSION_COOKIE_SECURE = SECURE_ACTIVATED
+SESSION_COOKIE_HTTPONLY = SECURE_ACTIVATED
+SESSION_COOKIE_SAMESITE = SECURE_ACTIVATED
 
 # Application definition
 DJANGO_APPS = [
@@ -113,6 +117,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {
+            "min_length": 12,
+        },
     },
     {
         "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
@@ -122,6 +129,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.Argon2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+]
 
 # Internationalization
 LANGUAGE_CODE = "en-us"
