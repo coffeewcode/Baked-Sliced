@@ -10,6 +10,9 @@ from django.utils.translation import gettext_lazy as _
 import secrets
 import phonenumbers
 from django.core.validators import MinLengthValidator
+from django.contrib.gis.db import models as gis_models
+from django.contrib.gis.geos import Point
+from typing import Optional, Tuple
 
 
 class UserManager(BaseUserManager):
@@ -57,16 +60,39 @@ class BaseUser(AbstractBaseUser, PermissionsMixin):
 
 
 class CustomerManager(BaseUserManager):
-    def create_via_whatsapp(self, phone_number, name):
+    def create_via_whatsapp(
+        self, phone_number, name
+    ) -> Tuple["CustomerUser", str, bool]:
         phone_number = self.normalize_phone(phone_number)
-        token = self.generate_access_token()
-        customer = self.model(
-            phone_number=phone_number, name=name, access_token=token, is_active=True
-        )
-        customer.save()
-        return customer, token
 
-    def normalize_phone(self, phone):
+        try:
+            customer = self.get(phone_number=phone_number)
+            if customer.token_expires_at < timezone.now():
+                token = customer.generate_new_token()
+            else:
+                token = customer.access_token
+            return customer, token, False
+        except CustomerUser.DoesNotExist:
+            token = self.generate_access_token()
+            customer = self.create(
+                phone_number=phone_number,
+                name=f"Customer-{phone_number[-4]}",
+                access_token=token,
+                is_active=True,
+                token_expires_at=timezone.now() + timezone.timedelta(minutes=15),
+            )
+            return customer, token, True
+
+    def validate_token(self, token) -> Optional["CustomerUser"]:
+        try:
+            customer = self.get(access_token=token)
+            if customer.token_expires_at >= timezone.now():
+                return customer
+            return None
+        except CustomerUser.DoesNotExist:
+            return None
+
+    def normalize_phone(self, phone) -> str:
         try:
             parsed = phonenumbers.parse(phone, None)
             if not phonenumbers.is_valid_number(parsed):
@@ -108,11 +134,28 @@ class CustomerUser(BaseUser):
         except phonenumbers.NumberParseException:
             raise ValidationError("Invalid phone number format")
 
-    def generate_new_token(self):
+    def generate_new_token(self) -> str:
         self.access_token = CustomerManager().generate_access_token()
         self.token_expires_at = timezone.now() + timezone.timedelta(minutes=15)
         self.save()
         return self.access_token
+
+
+class LoginAttempt(models.Model):
+    user = models.ForeignKey(
+        CustomerUser, on_delete=models.CASCADE, related_name="login_attempt"
+    )
+    ip_address = models.GenericIPAddressField(blank=True, null=True)
+    user_agent = models.TextField(blank=True)
+    location = gis_models.PointField(geography=True, blank=True, null=True)
+    city = models.CharField(max_length=100, blank=True)
+    country = models.CharField(max_length=100, blank=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    success = models.BooleanField(default=False)
+    token_used = models.CharField(max_length=44)
+
+    class Meta:
+        ordering = "-timestamp"
 
 
 class ManagerUserRoles(models.TextChoices):

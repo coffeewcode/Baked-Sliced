@@ -36,6 +36,8 @@ DJANGO_APPS = [
 
 DEPENDENCIES = [
     "rest_framework",
+    "django.contrib.gis",
+    "geoip2",
 ]
 
 MY_APPS = [
@@ -46,6 +48,7 @@ MY_APPS = [
     "delivery",
     "address",
     "shopping_cart",
+    "user",
 ]
 
 
